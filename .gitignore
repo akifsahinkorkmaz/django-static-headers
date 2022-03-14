@@ -1,0 +1,40 @@
+# source dir 
+# ----------
+# Scripts (for activating virtual environment)
+source/Scripts
+
+# py config (for virtual environment)
+source/pyvenv.cfg
+
+# Lib (python packages for virtual environment)
+# Only some part of django is returned :
+source/Lib/site-packages/*
+!source/Lib/site-packages/django
+
+source/Lib/site-packages/django/*
+
+# contrib.staticfiles.urls | contrib.staticfiles.views
+!source/Lib/site-packages/django/contrib
+
+source/Lib/site-packages/django/contrib/*
+!source/Lib/site-packages/django/contrib/staticfiles
+
+source/Lib/site-packages/django/contrib/staticfiles/*
+!source/Lib/site-packages/django/contrib/staticfiles/urls.py
+!source/Lib/site-packages/django/contrib/staticfiles/views.py
+
+# conf.urls.static
+!source/Lib/site-packages/django/conf
+
+source/Lib/site-packages/django/conf/*
+!source/Lib/site-packages/django/conf/urls
+
+source/Lib/site-packages/django/conf/urls/*
+!source/Lib/site-packages/django/conf/urls/static.py
+
+# views.static
+!source/Lib/site-packages/django/views
+
+source/Lib/site-packages/django/views/*
+!source/Lib/site-packages/django/views/static.py
+
