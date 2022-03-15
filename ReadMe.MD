@@ -51,7 +51,7 @@ For example client requests resource "image.png" from website-a. Does client wan
 
 ## Serving Static Files With Django
 
-Django has some methods to handle/serve static files on development. 
+Django has some methods to handle/serve static files on development. In this article static files (media) will be served with django's built-in modules.
 
 ---
 You need:
@@ -59,10 +59,47 @@ You need:
 - django package-
 - django project-
 
--ready. (For guide follow setup.MD)
+-ready to follow. (See setup.MD for help if needed.)
+
+---
+
+### 1) Creating static files directory
+
+Create a directory for static files inside first dsh folder:
+```bash
+# C:\...\source\dsh>
+mkdir static
+```
+
+---
+
+Creating sub-directories for styling (.css), scripts (.js) and media (images etc.) is a better practice! 
+There is no sub-directory because there is only media in this tutorial.
 
 ---
 
 
 
+### 1) Changing settings.py
 
+Add static settings to dsh/dsh/settings.py as :
+
+```python
+# - Before -
+STATIC_URL = '/static/'
+# - - -
+
+
+# - After -
+STATIC_URL = '/static/'
+
+staticpath = BASE_DIR / "static"
+STATICFILES_DIRS = [
+    staticpath,
+]
+# - - -
+```
+
+### 2) Adding Static Urls
+
+Add static urls to dsh/dsh/settings.py as :
