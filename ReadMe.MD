@@ -2,7 +2,9 @@
 
 Serving staticfiles (.js, .css, media, ...) is an important job of a server. 
 
-## Serving Static Files
+---
+## Introduction to Serving Static Files
+----
 
 ### Production
 There is different solutions for serving static files in production. For example ngnix gives an easy to follow guide for serving static content on their documentation ( at: https://docs.nginx.com/nginx/admin-guide/web-server/serving-static-content/ ). Using ngnix is a good choice for static file serving. 
@@ -13,11 +15,11 @@ You shouldn't use django for serving static files in production. As stated ( her
 Any server should function same on development as production. The problem is, using ngnix during early development is not pretty. Also django has development server and tools built-in for development purposes. Therefor it is acceptable to use django to serve static content on development. Django has some modules for that.
 
 
-## Necessary Headers For Serving Static Files
-
+### Necessary Headers For Serving Static Files
 Every HTTP request/response has headers to pass additional information with body. That way client and server can communicate better. Static files are no different. Headers are necessary for client or server to understand "what is the content?" and "what to do with content?".
 
-### CORS 
+---
+#### CORS 
 
 Cross-Origin Resource Sharing (CORS) is used when you try to load content from a different (domain, scheme, or port) website. 
 
@@ -37,15 +39,29 @@ Some CORS related response headers are:
 
 There are more headers related to CORS in HTTP but will not be used at this project. (further information: https://fetch.spec.whatwg.org/#http-cors-protocol) 
 
-
-### Content-Disposition 
+---
+#### Content-Disposition 
 
 For example client requests resource "image.png" from website-a. Does client want to display image.png on browser? Does client want to download image.png? Client can not know what to do with content by just content. There is a HTTP header for indicating use of content: 
 - Content-Disposition (indicates if content is for inline display on browser or download and save) 
 
 (further information: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition)
 
+---
 
+## Serving Static Files With Django
+
+Django has some methods to handle/serve static files on development. 
+
+---
+You need:
+- Python virtual environment- 
+- django package-
+- django project-
+
+-ready. (For guide follow setup.MD)
+
+---
 
 
 
