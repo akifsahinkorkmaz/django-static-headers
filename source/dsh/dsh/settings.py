@@ -120,9 +120,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-staticpath = BASE_DIR / "static"
+STATICPATHX = BASE_DIR / "static"
 STATICFILES_DIRS = [
-    staticpath,
+    STATICPATHX,
 ]
 
 

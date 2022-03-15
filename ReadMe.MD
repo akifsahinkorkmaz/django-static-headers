@@ -93,13 +93,108 @@ STATIC_URL = '/static/'
 # - After -
 STATIC_URL = '/static/'
 
-staticpath = BASE_DIR / "static"
+STATICPATHX = BASE_DIR / "static"
 STATICFILES_DIRS = [
-    staticpath,
+    STATICPATHX,
 ]
 # - - -
 ```
 
 ### 2) Adding Static Urls
 
-Add static urls to dsh/dsh/settings.py as :
+Add static urls to dsh/dsh/urls.py as :
+
+```python
+# - Before -
+from django.contrib import admin
+from django.urls import path
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
+# - - -
+
+
+# - After -
+from django.contrib import admin
+from django.urls import path
+
+from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+]
+
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns(settings.STATIC_URL)
+# - - -
+```
+
+### 3) Add Images To Static Directory
+
+Add any image to static directory at ".../dsh/static"
+
+### 4) Test The Server
+
+#### Run Server:
+---
+Test the server with:
+```bash
+# C:\...\source\dsh>
+
+# makemigrations
+python manage.py makemigrations
+
+# migrate
+python manage.py migrate
+
+# start development server
+python manage.py runserver
+```
+
+Output should be something like that:
+```bash
+Django version 3.2.12, using settings 'dsh.settings'
+Starting development server at http://0.0.0.0:8000/
+Quit the server with CTRL-BREAK.
+```
+
+link to that server is:
+
+```
+http://....:PORT 
+PORT = 8000
+http://....:8000/ = http://localhost:8000/
+```
+
+visit ``http://localhost:PORT``, PORT is 8000 almost everytime. 
+
+(link: http://localhost:8000/)
+
+---
+
+#### Test Server:
+
+Get the name of an image file on static folder (example: test1.png). 
+
+```
+└───static
+        test1.png
+        test2.png
+```
+
+Create the url to that image as:
+```
+base_url = http://localhost:8000/
+
+staticurl = http://localhost:8000/static
+
+imageurl = http://localhost:8000/static/test1.png
+```
+
+Visit imageurl (change image1.png part as your file name).
+
+(link: http://localhost:8000/static/test1.png)
+
+Image should be displayed by browser without any problem.

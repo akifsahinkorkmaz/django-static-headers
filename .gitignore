@@ -38,3 +38,5 @@ source/Lib/site-packages/django/conf/urls/*
 source/Lib/site-packages/django/views/*
 !source/Lib/site-packages/django/views/static.py
 
+# Db
+source/dsh/db.sqlite3
