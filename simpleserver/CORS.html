@@ -1,0 +1,38 @@
+<!-- simpleserver/CORS.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django-Cors</title>
+</head>
+<body>
+ 
+
+    <script>
+        const run = async () => {
+            // Create new image object
+            let Img = new Image();
+
+            // Fetch image from server
+            let response = await fetch("http://localhost:8000/static/test1.png"); 
+            
+            // Create url for fetched image
+            response = await response.blob();
+            let rurl = await URL.createObjectURL(response);
+            
+            // Set src for image object as fetched image's url
+            Img.src = await rurl;
+
+            Img.alt = "CORS Image"
+
+            // Show image
+            Img.onload = () => {
+                document.body.appendChild(Img)
+            }
+        }
+        run();
+    </script>
+</body>
+</html>

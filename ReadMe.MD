@@ -3,6 +3,7 @@
 Serving staticfiles (.js, .css, media, ...) is an important job of a server. 
 
 ---
+## SECTION 1
 ## Introduction to Serving Static Files
 ----
 
@@ -49,6 +50,7 @@ For example client requests resource "image.png" from website-a. Does client wan
 
 ---
 
+## SECTION 2
 ## Serving Static Files With Django
 
 Django has some methods to handle/serve static files on development. In this article static files (media) will be served with django's built-in modules.
@@ -80,7 +82,7 @@ There is no sub-directory because there is only media in this tutorial.
 
 
 
-### 1) Changing settings.py
+### 2) Changing settings.py
 
 Add static settings to dsh/dsh/settings.py as :
 
@@ -100,7 +102,7 @@ STATICFILES_DIRS = [
 # - - -
 ```
 
-### 2) Adding Static Urls
+### 3) Adding Static Urls
 
 Add static urls to dsh/dsh/urls.py as :
 
@@ -131,15 +133,15 @@ if settings.DEBUG:
 # - - -
 ```
 
-### 3) Add Images To Static Directory
+### 4) Add Images To Static Directory
 
 Add any image to static directory at ".../dsh/static"
 
-### 4) Test The Server
+### 5) Test The Server
 
-#### Run Server:
 ---
-Test the server with:
+#### 5.1) Run Server:
+Run the server with:
 ```bash
 # C:\...\source\dsh>
 
@@ -160,7 +162,7 @@ Starting development server at http://0.0.0.0:8000/
 Quit the server with CTRL-BREAK.
 ```
 
-link to that server is:
+Link to that server is:
 
 ```
 http://....:PORT 
@@ -168,13 +170,13 @@ PORT = 8000
 http://....:8000/ = http://localhost:8000/
 ```
 
-visit ``http://localhost:PORT``, PORT is 8000 almost everytime. 
+Visit ``http://localhost:PORT``, PORT is 8000 almost everytime. 
 
 (link: http://localhost:8000/)
 
 ---
 
-#### Test Server:
+#### 5.2) Test Server:
 
 Get the name of an image file on static folder (example: test1.png). 
 
@@ -195,6 +197,209 @@ imageurl = http://localhost:8000/static/test1.png
 
 Visit imageurl (change image1.png part as your file name).
 
-(link: http://localhost:8000/static/test1.png)
+(example link: http://localhost:8000/static/test1.png)
 
 Image should be displayed by browser without any problem.
+
+----
+
+## SECTION 3
+
+## Testing Static Files as CORS with Django
+
+Django as default does not contain necessary headers for CORS. 
+
+To test this, create a simpleserver directory and CORS.html file inside that directory as:
+
+```html
+<!-- simpleserver/CORS.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django-Cors</title>
+</head>
+<body>
+ 
+
+    <script>
+        const run = async () => {
+            // Create new image object
+            let Img = new Image();
+
+            // Fetch image from server
+            let response = await fetch("http://localhost:8000/static/test1.png"); 
+            
+            // Create url for fetched image
+            response = await response.blob();
+            let rurl = await URL.createObjectURL(response);
+            
+            // Set src for image object as fetched image's url
+            Img.src = await rurl;
+
+            Img.alt = "CORS Image"
+
+            // Show image
+            Img.onload = () => {
+                document.body.appendChild(Img)
+            }
+        }
+        // this will create a image from fetched url
+        run();
+
+    </script>
+</body>
+</html>
+```
+
+Serve the html with python:
+
+```bash
+# C:\...\simpleserver>
+python -m  http.server 7800
+```
+
+Visit http://localhost:7800/CORS.html
+
+This should render a blank page because there is an error. 
+
+Visit dev console on browser. Error should be something like this:
+
+```
+> Access to fetch at 'http://localhost:8000/static/test1.png' from origin 'http://localhost:7800' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+   
+> Failed to load resource: net::ERR_FAILED
+
+...
+``` 
+
+## Serving Static Files as CORS with Django
+
+For CORS to work, atleast Access-Control-Allow-Origin header is needed on response. Since django handles static files we can simply add this header.
+
+Django handles static files with a built-in function. See ``dsh/dsh/urls.py``:
+
+```python
+# ... (irrelevant code)
+
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns # built-in function for static files
+# This function is imported from: 
+# - django.contrib.staticfiles.url -
+
+# ... (irrelevant code)
+if settings.DEBUG:
+    urlpatterns += staticfiles_urlpatterns(settings.STATIC_URL)
+```
+
+The function can be traced from django module files. For virtualenv django module files are located as ``Lib/site-packages/django``
+
+Since function is from "contrib.staticfiles.urls" see  ``django/contrib/staticfiles/urls.py``
+
+```python
+# ... (irrelevant code)
+
+from django.conf.urls.static import static
+# this function is imported from:
+# - conf.urls.static - 
+
+from django.contrib.staticfiles.views import serve
+# this function is imported from:
+# - contrib.staticfiles.views - 
+
+def staticfiles_urlpatterns(prefix=None):
+    # ... (irrelevant code)
+
+    # conf.urls.static.static function is returned
+    return static(prefix, view=serve)
+```
+
+There is two path to check. 
+
+1)  ``django/conf/urls/static.py``
+2)  ``django/contrib/staticfiles/views.py``
+ 
+See both.  
+
+1)See ``django/conf/urls/static.py`` :
+
+```python 
+# ... (irrelevant code)
+from django.views.static import serve
+# this function is imported from:
+# - views.static -
+
+def static(prefix, view=serve, **kwargs):
+    # Note that view = django.views.static.serve as default 
+    # but view = contrib.staticfiles.views.serve was given at django/contrib/staticfiles/urls.py
+
+    # ... (irrelevant code)
+    
+    # returns re_path for urls.py with serve function as views from django.views.static
+    return [
+        re_path(r'^%s(?P<path>.*)$' % re.escape(prefix.lstrip('/')), view, kwargs=kwargs),
+    ]
+```
+
+2)See ``django/contrib/staticfiles/views.py`` :
+
+```python 
+# ... (irrelevant code)
+from django.views import static
+# this is imported from:
+# - views.static -
+# and used as 
+# - views.static.serve as it was in django/conf/urls/static.py-
+
+def serve(request, path, insecure=False, **kwargs):
+    # ... (irrelevant code)
+
+    # return views.static.serve function
+    return static.serve(request, path, document_root=document_root, **kwargs)
+```
+
+``django/views/static.py`` was imported at both modules. CORS headers can be added on that module.
+
+Add header to ``django/views/static.py``:
+
+```python
+from django.http import (
+    FileResponse, Http404, HttpResponse, HttpResponseNotModified,
+) 
+# FileResponse function is imported
+
+def serve(request, path, document_root=None, show_indexes=False):
+    path = posixpath.normpath(path).lstrip('/')
+    fullpath = Path(safe_join(document_root, path))
+
+    # ... (irrelevant code)
+    # response = FileResponse(...)
+
+    # Add header for CORS 
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    # - this wont be called if DEBUG = False but
+    # - if setttings.DEBUG: can be added for additional safety
+    # - import django.conf.settings for settings.DEBUG
+    # - - -
+
+    # ... (irrelevant code)
+    return response
+
+# ... (irrelevant code)
+```
+
+Test CORS.html again. It works now.
+
+----
+
+## SECTION 4
+
+## Content-Disposition
+
+Content-Disposition header is used for telling client "what to do with content". 
+
+Normally adding download attribute to html anchor element (``<a href="..." download></a>``) works fine for downloading the content from that link. And html image element (``<img src="...">``) will display content from that link. 
+
+### Try Anchor To Download Images
+
