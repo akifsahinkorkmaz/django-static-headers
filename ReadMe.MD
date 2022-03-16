@@ -222,14 +222,13 @@ To test this, create a simpleserver directory and CORS.html file inside that dir
     <title>Django-Cors</title>
 </head>
 <body>
- 
-
     <script>
         const run = async () => {
             // Create new image object
             let Img = new Image();
 
             // Fetch image from server
+            // Change test1.png with any filename from dsh/static
             let response = await fetch("http://localhost:8000/static/test1.png"); 
             
             // Create url for fetched image
@@ -248,7 +247,6 @@ To test this, create a simpleserver directory and CORS.html file inside that dir
         }
         // this will create a image from fetched url
         run();
-
     </script>
 </body>
 </html>
@@ -277,7 +275,7 @@ Visit dev console on browser. Error should be something like this:
 
 ## Serving Static Files as CORS with Django
 
-For CORS to work, atleast Access-Control-Allow-Origin header is needed on response. Since django handles static files we can simply add this header.
+For CORS to work, atleast Access-Control-Allow-Origin header is needed on response. Since django handles static files we can't simply add this header.
 
 Django handles static files with a built-in function. See ``dsh/dsh/urls.py``:
 
@@ -401,5 +399,95 @@ Content-Disposition header is used for telling client "what to do with content".
 
 Normally adding download attribute to html anchor element (``<a href="..." download></a>``) works fine for downloading the content from that link. And html image element (``<img src="...">``) will display content from that link. 
 
+### Create download folder on static folder
+
+Create a directory for downloadable files inside first dsh/static folder:
+
+```bash
+# C:\...\source\dsh\static>
+mkdir download
+```
+
+Add any image to download directory at ".../dsh/static/download"
+
+
 ### Try Anchor To Download Images
 
+Create download.html on simpleserverdirectory:
+
+```html
+<!-- simpleserver/download.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <a download href="http://localhost:8000/static/download/download.png"></a>
+    <!-- Change download.png with any filename from dsh/static/download -->
+</body>
+</html>
+```
+
+### Test Anchor To Download Images
+
+Visit http://localhost:7800/download.html
+
+Click on download. Image should be opened on browser instead of downloading and saving.
+
+### Serving Static Files as downloadable with Django
+
+For download to work, Content-Disposition header is needed on response. Since django handles static files we can't simply add this header.
+
+Add header to ``django/views/static.py`` again:
+
+```python
+from django.http import (
+    FileResponse, Http404, HttpResponse, HttpResponseNotModified,
+) 
+# FileResponse function is imported
+
+def serve(request, path, document_root=None, show_indexes=False):
+    path = posixpath.normpath(path).lstrip('/')
+    fullpath = Path(safe_join(document_root, path))
+
+    # ... (irrelevant code)
+    # response = FileResponse(...)
+
+    if fullpath.parent.name == "download":
+             response.headers["Content-Disposition"] = "attachment"
+
+    # Add header for CORS 
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    # - this wont be called if DEBUG = False but
+    # - if setttings.DEBUG: can be added for additional safety
+    # - import django.conf.settings for settings.DEBUG
+    # - - -
+
+    # Add header for download 
+    if "download" in str(path):
+        response.headers["Content-Disposition"] = "attachment"
+    # - this wont be called if DEBUG = False but
+    # - if setttings.DEBUG: can be added for additional safety
+    # - import django.conf.settings for settings.DEBUG
+    # - - -
+
+    # ... (irrelevant code)
+    return response
+
+# ... (irrelevant code)
+```
+
+### Test Anchor To Download Images Again
+
+Visit http://localhost:7800/download.html
+
+Click on download. Image should be downloaded.
+
+
+--- 
+END 
+---
