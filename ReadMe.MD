@@ -13,7 +13,7 @@ There is different solutions for serving static files in production. For example
 You shouldn't use django for serving static files in production. As stated ( here:  https://docs.djangoproject.com/en/4.0/howto/static-files/ ) django is inefficient and probably insecure. 
 
 ### Development
-Any server should function same on development as production. The problem is, using ngnix during early development is not pretty. Also django has development server and tools built-in for development purposes. Therefor it is acceptable to use django to serve static content on development. Django has some modules for that.
+Any server should function same on development as production. The problem is, using ngnix during early development is not pretty. Also django has development server and built-in tools for development purposes. Therefor it is acceptable to use django to serve static content on development. Django has some modules for that.
 
 
 ### Necessary Headers For Serving Static Files
@@ -43,7 +43,7 @@ There are more headers related to CORS in HTTP but will not be used at this proj
 ---
 #### Content-Disposition 
 
-For example client requests resource "image.png" from website-a. Does client want to display image.png on browser? Does client want to download image.png? Client can not know what to do with content by just content. There is a HTTP header for indicating use of content: 
+For example client requests resource "image.png" from website-a. Does the client want to display image.png on browser? Does the client want to download image.png? Client can not know what to do with content by just content itself. There is a HTTP header for indicating the aimed use of content: 
 - Content-Disposition (indicates if content is for inline display on browser or download and save) 
 
 (further information: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition)
